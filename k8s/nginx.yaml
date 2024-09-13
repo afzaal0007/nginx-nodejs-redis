@@ -1,0 +1,42 @@
+apiVersion: apps/v1  
+kind: Deployment  
+metadata:  
+  name: nginx  
+  labels:  
+    app: nginx  
+spec:  
+  replicas: 1  
+  selector:  
+    matchLabels:  
+      app: nginx  
+  template:  
+    metadata:  
+      labels:  
+        app: nginx  
+    spec:  
+      containers:  
+        - name: nginx  
+          image: <aws_account_id>.dkr.ecr.<region>.amazonaws.com/nginx:latest # Replace with your ECR URI  
+          ports:  
+            - containerPort: 80  
+          resources:  
+            limits:  
+              memory: "256Mi"  
+              cpu: "500m"  
+            requests:  
+              memory: "128Mi"  
+              cpu: "250m"  
+---  
+apiVersion: v1  
+kind: Service  
+metadata:  
+  name: nginx  
+  annotations:  
+    service.beta.kubernetes.io/aws-load-balancer-type: "application" # Use "network" for NLB or remove for Classic ELB  
+spec:  
+  type: LoadBalancer  
+  ports:  
+    - port: 80  
+      targetPort: 80  
+  selector:  
+    app: nginx

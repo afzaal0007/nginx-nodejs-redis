@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web1
+  labels:
+    app: web1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web1
+  template:
+    metadata:
+      labels:
+        app: web1
+    spec:
+      containers:
+      - name: web1
+        image: <aws_account_id>.dkr.ecr.<region>.amazonaws.com/web:latest # Replace with your ECR URI  
+        ports:
+        - containerPort: 5000
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web1
+spec:
+  type: NodePort
+  ports:
+  - port: 81
+    targetPort: 5000
+    nodePort: 30081 # Define your own NodePort or let Kubernetes assign one  
+  selector:
+    app: web1
