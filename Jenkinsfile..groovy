@@ -1,29 +1,28 @@
-
-// Jenkins File with ECR Updates
-
 pipeline {
     agent any
 
     environment {
-        AWS_REGION = 'ap-south-1'
-        ECR_REGISTRY = '772149515781.dkr.ecr.ap-south-1.amazonaws.com'
-        ECR_REPOSITORY_NODE = 'node-js-app'
-        ECR_REPOSITORY_MYSQL = 'node-js-app-db'
-        DOCKER_IMAGE_NODE = "${ECR_REGISTRY}/${ECR_REPOSITORY_NODE}:latest"
-        DOCKER_IMAGE_MYSQL = "${ECR_REGISTRY}/${ECR_REPOSITORY_MYSQL}:latest"
+        AWS_ECR_LOGIN = 'aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 772149515781.dkr.ecr.ap-south-1.amazonaws.com'
+        ECR_REPO_URI = '772149515781.dkr.ecr.ap-south-1.amazonaws.com'
+        GIT_REPO = 'https://github.com/afzaal0007/nginx-nodejs-redis.git'
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Clone Repository') {
             steps {
-                git 'https://github.com/your-repo/your-node-app.git'
+                git branch: 'main', url: "${GIT_REPO}"
             }
         }
-        stage('Build Docker Images') {
+
+        stage('Install Dependencies') {
             steps {
                 script {
-                    sh 'docker build -t ${DOCKER_IMAGE_NODE} -f docker/node/Dockerfile .'
-                    sh 'docker build -t ${DOCKER_IMAGE_MYSQL} -f docker/db/Dockerfile .'
+                    // Install Node.js dependencies for your app
+                    sh 'cd app && npm install -g npm-check-updates'
+                    sh 'ncu -u'
+                    sh 'cd app && npm install --save-dev mocha'
+                    sh 'cd app && npm audit fix'
+                    sh 'npm install --save-dev mocha'
                 }
             }
         }
@@ -31,43 +30,74 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    // Running basic tests
-                    sh 'npm install'
-                    sh 'npm test'
+                    // Run tests for your Node.js app
+                    sh 'cd app && npm test'
                 }
             }
         }
 
+        stage('Build Docker Images') {
+            steps {
+                script {
+                    sh 'docker-compose build'
+                }
+            }
+        }
 
-        stage('Login to AWS ECR') {
+        stage('Push Images to ECR') {
             steps {
                 script {
-                    sh 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}'
+                    // Log in to AWS ECR
+                    sh "${AWS_ECR_LOGIN}"
+
+                    // Push Redis image
+                    sh """
+                        docker tag redis:alpine ${ECR_REPO_URI}/redis:alpine
+                        docker push ${ECR_REPO_URI}/redis:alpine
+                    """
+
+                    // Push Web1 image
+                    sh """
+                        docker tag web1 ${ECR_REPO_URI}/web1:${BUILD_NUMBER}
+                        docker push ${ECR_REPO_URI}/web1:${BUILD_NUMBER}
+                    """
+
+                    // Push Web2 image
+                    sh """
+                        docker tag web2 ${ECR_REPO_URI}/web2:${BUILD_NUMBER}
+                        docker push ${ECR_REPO_URI}/web2:${BUILD_NUMBER}
+                    """
+
+                    // Push Nginx image
+                    sh """
+                        docker tag nginx ${ECR_REPO_URI}/nginx:${BUILD_NUMBER}
+                        docker push ${ECR_REPO_URI}/nginx:${BUILD_NUMBER}
+                    """
                 }
             }
         }
-        stage('Push Docker Images to ECR') {
+
+        stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    sh 'docker push ${DOCKER_IMAGE_NODE}'
-                    sh 'docker push ${DOCKER_IMAGE_MYSQL}'
-                }
-            }
-        }
-        stage('Deploy to EKS') {
-            steps {
-                script {
-                    // Apply Kubernetes configurations
-                    sh 'kubectl apply -f /mnt/data/k8s-mysql.yaml'
-                    sh 'kubectl apply -f /mnt/data/k8s-node.yaml'
-                    sh 'kubectl apply -f /mnt/data/app-secret.yaml'
-                    sh 'kubectl apply -f /mnt/data/app-config.yaml'
+                    // Update the deployment YAML files dynamically with the ECR image tag
+                    sh '''
+                    sed -i 's|<aws_account_id>.dkr.ecr.<region>.amazonaws.com/web:latest|772149515781.dkr.ecr.ap-south-1.amazonaws.com/web1:'${BUILD_NUMBER}'|g' k8s-web1.yaml
+                    sed -i 's|<aws_account_id>.dkr.ecr.<region>.amazonaws.com/web:latest|772149515781.dkr.ecr.ap-south-1.amazonaws.com/web2:'${BUILD_NUMBER}'|g' k8s-web2.yaml
+                    sed -i 's|<aws_account_id>.dkr.ecr.<region>.amazonaws.com/nginx:latest|772149515781.dkr.ecr.ap-south-1.amazonaws.com/nginx:'${BUILD_NUMBER}'|g' k8s-nginx.yaml
+                    kubectl apply -f k8s-web1.yaml
+                    kubectl apply -f k8s-web2.yaml
+                    kubectl apply -f k8s-nginx.yaml
+                    kubectl apply -f k8s-redis.yaml
+                    '''
                 }
             }
         }
     }
+
     post {
         always {
+            // Optional: Clean up workspace after build
             cleanWs()
         }
     }

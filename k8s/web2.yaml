@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: web2
-        image: <aws_account_id>.dkr.ecr.<region>.amazonaws.com/web:latest # Replace with your ECR URI  
+        image: <aws_account_id>.dkr.ecr.<region>.amazonaws.com/web2:latest # Replace with ECR URI in Jenkins pipeline
         ports:
         - containerPort: 5000
         resources:

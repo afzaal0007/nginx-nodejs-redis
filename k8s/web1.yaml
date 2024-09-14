@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: web1
-        image: <aws_account_id>.dkr.ecr.<region>.amazonaws.com/web:latest # Replace with your ECR URI  
+        image: <aws_account_id>.dkr.ecr.<region>.amazonaws.com/web1:latest # Placeholder to be replaced by Jenkins
         ports:
         - containerPort: 5000
         resources:

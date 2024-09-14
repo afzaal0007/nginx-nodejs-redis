@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: redis
-        image: redis:alpine # Replace with your ECR URI  
+        image: redis:alpine
         ports:
         - containerPort: 6379
         resources:
