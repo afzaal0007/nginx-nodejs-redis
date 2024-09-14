@@ -82,13 +82,15 @@ pipeline {
                 script {
                     // Update the deployment YAML files dynamically with the ECR image tag
                     sh '''
-                    sed -i 's|<aws_account_id>.dkr.ecr.<region>.amazonaws.com/web:latest|772149515781.dkr.ecr.ap-south-1.amazonaws.com/web1:'${BUILD_NUMBER}'|g' k8s-web1.yaml
-                    sed -i 's|<aws_account_id>.dkr.ecr.<region>.amazonaws.com/web:latest|772149515781.dkr.ecr.ap-south-1.amazonaws.com/web2:'${BUILD_NUMBER}'|g' k8s-web2.yaml
-                    sed -i 's|<aws_account_id>.dkr.ecr.<region>.amazonaws.com/nginx:latest|772149515781.dkr.ecr.ap-south-1.amazonaws.com/nginx:'${BUILD_NUMBER}'|g' k8s-nginx.yaml
-                    kubectl apply -f k8s-web1.yaml
-                    kubectl apply -f k8s-web2.yaml
-                    kubectl apply -f k8s-nginx.yaml
-                    kubectl apply -f k8s-redis.yaml
+                     sed -i 's|<aws_account_id>.dkr.ecr.<region>.amazonaws.com/web1:<tag>|772149515781.dkr.ecr.ap-south-1.amazonaws.com/web1:${BUILD_NUMBER}|g' web1.yaml
+                     sed -i 's|<aws_account_id>.dkr.ecr.<region>.amazonaws.com/web2:<tag>|772149515781.dkr.ecr.ap-south-1.amazonaws.com/web2:${BUILD_NUMBER}|g' web2.yaml
+                     sed -i 's|<aws_account_id>.dkr.ecr.<region>.amazonaws.com/nginx:<tag>|772149515781.dkr.ecr.ap-south-1.amazonaws.com/nginx:${BUILD_NUMBER}|g' nginx.yaml
+
+
+                    kubectl apply -f web1.yaml
+                    kubectl apply -f web2.yaml
+                    kubectl apply -f nginx.yaml
+                    kubectl apply -f redis.yaml
                     '''
                 }
             }

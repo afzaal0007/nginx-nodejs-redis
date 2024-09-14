@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
       - name: web1
-        image: <aws_account_id>.dkr.ecr.<region>.amazonaws.com/web1:latest # Placeholder to be replaced by Jenkins
+        image: <aws_account_id>.dkr.ecr.<region>.amazonaws.com/web1:<tag>
+        imagePullPolicy: Always # Ensure this is set to Always
         ports:
         - containerPort: 5000
         resources:
