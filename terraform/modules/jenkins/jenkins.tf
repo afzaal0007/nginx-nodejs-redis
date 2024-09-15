@@ -30,6 +30,13 @@ resource "aws_instance" "jenkins" {
     sudo systemctl start jenkins
     sudo dnf install aws-cli -y
     sleep 100
+    sudo curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.21.5/2022-10-31/bin/linux/amd64/kubectl
+    sleep 100
+    sudo chmod +x ./kubectl
+    sudo mv ./kubectl /usr/local/bin
+    aws eks update-kubeconfig --region ${var.region} --name ${var.cluster_name}
+
+
 
   EOF
   tags = {

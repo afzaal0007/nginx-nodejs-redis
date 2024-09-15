@@ -5,6 +5,11 @@ module "vpc" {
 
 }
 
+module "SecretsManager" {
+
+  source = "./modules/secretsmanager"
+
+}
 
 # Jenkins Module
 
@@ -37,6 +42,7 @@ module "jenkins" {
   ssh_key_name   = var.ssh_key_name
   vpc_id         = module.vpc.vpc_id               # Pass the VPC ID to the Jenkins module
   subnet_id      = module.vpc.public_subnet_ids[0] # Example of passing a subnet ID
-
+  cluster_name   = var.cluster_name
+  region         = var.region
 
 }

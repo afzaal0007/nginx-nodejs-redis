@@ -47,3 +47,16 @@ variable "vpc_id" {
   description = "The ID of the VPC where the Jenkins server will be deployed."
   type        = string
 }
+
+// region = ap-south-1
+
+variable "region" {
+  description = "The AWS region where the Jenkins server will be deployed."
+  type        = string
+}
+
+
+variable "cluster_name" {
+  description = "The ID of the EKS cluster where the Jenkins server will be deployed."
+  type        = string
+}

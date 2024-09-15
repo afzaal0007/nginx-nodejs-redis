@@ -1,9 +1,3 @@
-# Create AWS Secrets Manager secret
-resource "aws_secretsmanager_secret" "env_secrets" {
-  name        = "jenkins-env-secrets"
-  description = "Secrets for Jenkins environment variables"
-}
-
 # Store the secrets for environment variables including AWS_ECR_LOGIN
 resource "aws_secretsmanager_secret_version" "env_secrets_version" {
   secret_id = aws_secretsmanager_secret.env_secrets.id

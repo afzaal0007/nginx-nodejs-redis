@@ -1,5 +1,5 @@
 # AWS Region
-variable "aws_region" {
+variable "region" {
   description = "The AWS region where resources will be created."
   type        = string
   default     = "ap-south-1"
