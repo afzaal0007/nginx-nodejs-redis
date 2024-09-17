@@ -1,7 +1,7 @@
 variable "eks_cluster_name" {
   description = "The name of the EKS cluster."
   type        = string
-  # default     = "k8s-cluster"
+
 }
 
 variable "cluster_role_arn" {
@@ -18,34 +18,32 @@ variable "public_subnet_ids" {
 variable "eks_version" {
   description = "EKS Version"
   type        = string
-  default     = "1.26"
+
 }
 
 variable "desired_size" {
   description = "desired capacity of the cluster "
   type        = string
-  default     = "1"
+
 
 }
 
 variable "max_size" {
   description = "maximum capacity of the cluster "
   type        = string
-  default     = "2"
 
 }
 
 variable "min_size" {
   description = "minimum capacity of the cluster "
   type        = string
-  default     = "1"
+
 
 }
 
-variable "instance_type" {
+variable "EkS_Worker_Node_Instance" {
   description = "instance type of the cluster "
   type        = string
-  default     = "t2.small"
 
 }
 

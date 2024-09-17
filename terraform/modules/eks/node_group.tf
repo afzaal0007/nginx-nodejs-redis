@@ -3,8 +3,9 @@ resource "aws_eks_node_group" "eks_node_group" {
   node_group_name = "${var.eks_cluster_name}-node-group"
   node_role_arn   = var.node_group_role_arn
   subnet_ids      = var.public_subnet_ids
-  instance_types  = [var.instance_type]
+  instance_types  = [var.EkS_Worker_Node_Instance]
   disk_size       = 20
+  version         = var.eks_version
 
 
 

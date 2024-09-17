@@ -36,6 +36,11 @@ resource "aws_iam_role_policy_attachment" "secretsmanager_access" {
   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
 }
 
+resource "aws_iam_role_policy_attachment" "attach_prometheus_policy" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonPrometheusRemoteWriteAccess"
+}
+
 
 # Create an Instance Profile for EC2 to assume the role
 resource "aws_iam_instance_profile" "jenkins_instance_profile" {

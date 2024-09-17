@@ -25,8 +25,32 @@ spec:
             memory: "256Mi"
             cpu: "500m"
           requests:
+            cpu: "250m"
+            memory: "128Mi"
+      - name: fluent-bit
+        image: fluent/fluent-bit:3.1
+        imagePullPolicy: Always # Ensure this is set to Always
+        ports:
+        - containerPort: 24224
+        resources:
+          limits:
             memory: "128Mi"
             cpu: "250m"
+          requests:
+            memory: "64Mi"
+            cpu: "125m"
+        volumeMounts:
+        - name: varlog
+          mountPath: /var/log
+        env:
+        - name: FLUENT_ELASTICSEARCH_HOST
+          value: "logs.example.com"
+        - name: FLUENT_ELASTICSEARCH_PORT
+          value: "443"
+      volumes:
+      - name: varlog
+        hostPath:
+          path: /var/log
 ---
 apiVersion: v1
 kind: Service

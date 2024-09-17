@@ -7,15 +7,19 @@ const redisClient = redis.createClient({
   port: 6379
 });
 
+// Import metrics
+const metricsApp = require('./metrics');
+app.use(metricsApp);
+
 app.get('/', function(req, res) {
     redisClient.get('numVisits', function(err, numVisits) {
-        numVisitsToDisplay = parseInt(numVisits) + 1;
+       let numVisitsToDisplay = parseInt(numVisits) + 1;
         if (isNaN(numVisitsToDisplay)) {
             numVisitsToDisplay = 1;
         }
        res.send(os.hostname() +': Number of visits is: ' + numVisitsToDisplay);
         numVisits++;
-        redisClient.set('numVisits', numVisits);
+        redisClient.set('numVisits', numVisitsToDisplay);
     });
 });
 
