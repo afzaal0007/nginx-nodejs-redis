@@ -11,3 +11,13 @@ terraform {
 provider "aws" {
   region = "ap-south-1"
 }
+
+
+
+# main.tf
+
+provider "helm" {
+  kubernetes {
+    config_path = "~/.kube/config" # Ensure kubeconfig is correctly set
+  }
+}

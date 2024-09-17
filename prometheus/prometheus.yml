@@ -1,7 +1,9 @@
 global:
   scrape_interval: 15s
-
+  evaluation_interval: 15s
 scrape_configs:
 - job_name: 'nodejs-app'
   static_configs:
-  - targets: ['localhost:3000']
+  - targets: ['web1:5000', 'web2:5000', 'nginx:80']
+    scrape_interval: 15s
+    metrics_path: /metrics # If your Node.js exposes metrics on this path

@@ -8,3 +8,5 @@ variable "tags" {
   }
 }
 
+# variables.tf
+

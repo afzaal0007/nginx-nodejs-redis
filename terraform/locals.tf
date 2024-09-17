@@ -52,4 +52,21 @@ locals {
 
   ssh_key_name = "EKS-Key-PAIR"
 
+
+  // prometheus variables values
+
+  environment              = "dev"
+  prometheus_chart_version = "45.8.0"
+  prometheus_namespace     = "monitoring"
+  grafana_admin_password   = "Grafana@2024"
+  scrape_interval          = "15s"
+  evaluation_interval      = "15s"
+  nodejs_targets           = ["web1:5000", "web2:5000", "nginx:80"]
+
+
+
+
 }
+
+
+

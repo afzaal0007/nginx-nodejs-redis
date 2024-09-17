@@ -55,26 +55,14 @@ module "jenkins" {
 }
 
 
-module "prometheus" {
-  source  = "terraform-aws-modules/prometheus/aws"
-  version = "~> 1.0"
 
-  name        = "aws-managed-prometheus"
-  environment = var.environment
-  tags = {
-    Name        = "aws-managed-prometheus"
-    Environment = var.environment
-  }
-}
-
-
-
-module "loki" {
-  source = "./modules/loki"
-  # Pass necessary variables to the Loki module
-}
-
-module "fluentbit" {
-  source = "./modules/fluentbit"
-  # Pass necessary variables to the FluentBit module
+module "monitoring" {
+  source                   = "./modules/Prometheus"
+  environment              = local.environment
+  prometheus_chart_version = local.prometheus_chart_version
+  grafana_admin_password   = local.grafana_admin_password
+  scrape_interval          = local.scrape_interval
+  evaluation_interval      = local.evaluation_interval
+  nodejs_targets           = local.nodejs_targets
+  prometheus_namespace     = local.prometheus_namespace
 }
