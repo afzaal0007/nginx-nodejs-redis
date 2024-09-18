@@ -7,12 +7,9 @@ pipeline {
         SECRET_NAME = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".SECRET_NAME"', returnStdout: true).trim()
         ECR_REPO_URI = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".ECR_REPO_URI"', returnStdout: true).trim()
         GIT_REPO = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".GIT_REPO"', returnStdout: true).trim()
-        AWS_ECR_LOGIN = "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO_URI}"
-        
-        // Environment variables for AWS Secrets Manager
-        AWS_REGION = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".AWS_REGION"', returnStdout: true).trim()
         GRAFANA_ADMIN_PASSWORD = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".grafana_admin_password"', returnStdout: true).trim()
-    
+
+        AWS_ECR_LOGIN = "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO_URI}"
     }
 
     stages {
@@ -25,12 +22,10 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Install Node.js dependencies for your app
                     sh 'cd app && npm install -g npm-check-updates'
                     sh 'ncu -u'
                     sh 'cd app && npm install --save-dev mocha'
                     sh 'cd app && npm audit fix'
-                    sh 'npm install --save-dev mocha'
                 }
             }
         }
@@ -38,7 +33,6 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    // Run tests for your Node.js app
                     sh 'cd app && npm test'
                 }
             }
@@ -55,7 +49,6 @@ pipeline {
         stage('Push Images to ECR') {
             steps {
                 script {
-                    // Log in to AWS ECR
                     sh "${AWS_ECR_LOGIN}"
 
                     // Push Redis image
@@ -85,11 +78,9 @@ pipeline {
             }
         }
 
- stages {
         stage('Install Monitoring Tools') {
             steps {
                 script {
-                    // Deploy Prometheus and Grafana via Helm
                     sh '''
                       helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
                       helm repo update
@@ -103,16 +94,14 @@ pipeline {
                 }
             }
         }
- }
 
         stage('Deploy to Kubernetes') {
-            steps script {
-                    // Get secrets from AWS Secrets Manager
+            steps {
+                script {
                     def awsAccountId = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-env-secrets --region ap-south-1 --query SecretString --output text | jq -r ".AWS_ACCOUNT_ID"', returnStdout: true).trim()
                     def region = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-env-secrets --region ap-south-1 --query SecretString --output text | jq -r ".AWS_REGION"', returnStdout: true).trim()
                     def repoUri = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-env-secrets --region ap-south-1 --query SecretString --output text | jq -r ".ECR_REPO_URI"', returnStdout: true).trim()
 
-                    // Update deployment YAML files with dynamic values
                     sh """
                      sed -i 's|<aws_account_id>.dkr.ecr.<region>.amazonaws.com/web1:<tag>|${repoUri}/web1:${BUILD_NUMBER}|g' web1.yaml
                      sed -i 's|<aws_account_id>.dkr.ecr.<region>.amazonaws.com/web2:<tag>|${repoUri}/web2:${BUILD_NUMBER}|g' web2.yaml
@@ -122,26 +111,22 @@ pipeline {
                      kubectl apply -f web1.yaml
                      kubectl apply -f web2.yaml
                      kubectl apply -f nginx.yaml
-                     
                     """
                 }
             }
         }
-    
 
-stage('Check Node.js Metrics') {
+        stage('Check Node.js Metrics') {
             steps {
                 script {
-                    // Test Prometheus metrics endpoint
                     sh 'curl http://web1:3000/metrics'
                 }
             }
         }
-    
+    }
 
     post {
         always {
-            // Optional: Clean up workspace after build
             cleanWs()
         }
     }
