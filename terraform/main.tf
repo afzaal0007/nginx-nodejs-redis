@@ -13,12 +13,15 @@ module "vpc" {
 
 module "SecretsManager" {
 
-  source        = "./modules/secretsmanager"
-  SECRET_NAME   = local.SECRET_NAME
-  AWS_REGION    = local.region
-  ECR_REPO_URI  = local.ECR_REPO_URI
-  GIT_REPO      = local.GIT_REPO
-  AWS_ECR_LOGIN = local.AWS_ECR_LOGIN
+  source                 = "./modules/secretsmanager"
+  SECRET_NAME            = local.SECRET_NAME
+  AWS_REGION             = local.region
+  ECR_REPO_URI           = local.ECR_REPO_URI
+  GIT_REPO               = local.GIT_REPO
+  grafana_admin_password = local.grafana_admin_password
+  datadog_api_key        = local.datadog_api_key
+
+
 }
 
 # Call the EKS module
@@ -65,4 +68,17 @@ module "monitoring" {
   evaluation_interval      = local.evaluation_interval
   nodejs_targets           = local.nodejs_targets
   prometheus_namespace     = local.prometheus_namespace
+}
+
+
+# main.tf
+
+# Datadog Module
+module "datadog" {
+  source = "./modules/datadog"
+  # datadog_api_key = jsondecode(data.aws_secretsmanager_secret_version.datadog_api_key.secret_string)["datadog_api_key"]
+  # datadog_app_key = jsondecode(data.aws_secretsmanager_secret_version.datadog_app_key.secret_string)["datadog_app_key"] # Assuming you also store the app key in Secrets Manager
+
+  datadog_api_key = local.datadog_api_key
+  datadog_app_key = local.datadog_app_key
 }

@@ -8,6 +8,11 @@ pipeline {
         ECR_REPO_URI = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".ECR_REPO_URI"', returnStdout: true).trim()
         GIT_REPO = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".GIT_REPO"', returnStdout: true).trim()
         AWS_ECR_LOGIN = "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO_URI}"
+        
+        // Environment variables for AWS Secrets Manager
+        AWS_REGION = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".AWS_REGION"', returnStdout: true).trim()
+        GRAFANA_ADMIN_PASSWORD = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".grafana_admin_password"', returnStdout: true).trim()
+    
     }
 
     stages {
@@ -80,6 +85,26 @@ pipeline {
             }
         }
 
+ stages {
+        stage('Install Monitoring Tools') {
+            steps {
+                script {
+                    // Deploy Prometheus and Grafana via Helm
+                    sh '''
+                      helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+                      helm repo update
+                      helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+                      --namespace monitoring \
+                      --create-namespace \
+                      --set grafana.adminPassword=${GRAFANA_ADMIN_PASSWORD} \
+                      --values values.yaml \
+                      --version <chart_version>
+                    '''
+                }
+            }
+        }
+ }
+
         stage('Deploy to Kubernetes') {
             steps script {
                     // Get secrets from AWS Secrets Manager
@@ -103,6 +128,16 @@ pipeline {
             }
         }
     
+
+stage('Check Node.js Metrics') {
+            steps {
+                script {
+                    // Test Prometheus metrics endpoint
+                    sh 'curl http://web1:3000/metrics'
+                }
+            }
+        }
+    }
 
     post {
         always {

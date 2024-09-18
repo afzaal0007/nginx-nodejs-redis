@@ -7,13 +7,13 @@ resource "helm_release" "kube_prometheus_stack" {
 
   create_namespace = true
 
-  # Reference external custom values.yaml template file
   values = [
     templatefile("${path.module}/values.yaml.tpl", {
       grafana_admin_password = var.grafana_admin_password,
-      scrape_interval        = var.scrape_interval,     # Example custom variable
-      evaluation_interval    = var.evaluation_interval, # Example custom variable
-      nodejs_targets         = var.nodejs_targets       # Example list of Node.js app targets
+      scrape_interval        = var.scrape_interval,            # Example custom variable
+      evaluation_interval    = var.evaluation_interval,        # Example custom variable
+      nodejs_targets         = jsonencode(var.nodejs_targets), # Must be json-encoded list of targets
+      environment            = var.environment
     })
   ]
 }

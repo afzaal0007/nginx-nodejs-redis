@@ -63,9 +63,9 @@ locals {
   evaluation_interval      = "15s"
   nodejs_targets           = ["web1:5000", "web2:5000", "nginx:80"]
 
-
-
-
+  // Datadog Variable Values
+  datadog_api_key = "a67dae18-9d3c-4adf-a8f0-6dbc1b404d51"
+  datadog_app_key = "897fcef61c15a9877f0bbbd5e288d256a1ec1253"
 }
 
 

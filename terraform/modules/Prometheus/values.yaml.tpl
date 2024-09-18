@@ -1,3 +1,5 @@
+# modules/monitoring/values.yaml.tpl
+
 grafana:
   adminPassword: "${grafana_admin_password}"
   enabled: true
@@ -7,18 +9,18 @@ grafana:
 prometheus:
   prometheusSpec:
     externalLabels:
-      environment: "${var.environment}"
-    scrape_interval: ${scrape_interval}          # New value for scrape interval
-    evaluation_interval: ${evaluation_interval}  # New value for evaluation interval
-    scrape_configs:
-      - job_name: 'nodejs-app'
+      environment: "${environment}"
+    scrapeInterval: "${scrape_interval}"  # Custom scrape interval
+    evaluationInterval: "${evaluation_interval}" # Custom evaluation interval
+    additionalScrapeConfigs:
+      - job_name: 'nodejs-apps'
         static_configs:
-          - targets: ${nodejs_targets}          # New value for scraping Node.js app
+          - targets:" ${nodejs_targets}"  # Node.js app targets as list
 
 alertmanager:
   alertmanagerSpec:
     externalLabels:
-      environment: "${var.environment}"
+      environment: "${environment}"
 
 serviceMonitorSelector:
   matchLabels:
