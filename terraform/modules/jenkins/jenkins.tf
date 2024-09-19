@@ -19,14 +19,13 @@ resource "aws_instance" "jenkins" {
     sudo dnf update -y
     sleep 60 # Wait for the system to stabilize and network to initialize
     sudo dnf install java-11-amazon-corretto -y
-    # Add Jenkins repository
     sudo curl -fsSL https://pkg.jenkins.io/redhat-stable/jenkins.repo -o /etc/yum.repos.d/jenkins.repo
     sleep 30
-    # Import Jenkins GPG key
+ 
     sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
-    # Clear the cache to prevent any previous failed download issues
+  
     sudo dnf clean all
-    # Install Jenkins
+
     sudo dnf install jenkins -y --nogpgcheck
     sudo systemctl enable jenkins
     sudo systemctl start jenkins
@@ -38,10 +37,22 @@ resource "aws_instance" "jenkins" {
     sudo mv ./kubectl /usr/local/bin
     aws eks update-kubeconfig --region ${var.region} --name ${var.cluster_name}
     sleep 100
-    sudo dnf update
-    sudo dnf install git
-    sudo dnf install nodejs npm
+    sudo dnf update -y
+    sudo dnf install git -y
+    sudo dnf install nodejs npm -y
     sleep 100
+    sudo dnf install docker -y
+    sleep 100
+sudo systemctl start docker  
+sudo systemctl enable docker
+sudo usermod -aG docker $USER
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sleep 60
+sudo chmod +x /usr/local/bin/docker-compose
+sudo mkdir /home/jenkins
+sudo chown jenkins:jenkins /home/jenkins
+sudo mkdir /home/jenkins/agent
+sudo chown -R jenkins:jenkins /home/jenkins/agent
 
 
 
