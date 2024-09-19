@@ -32,13 +32,7 @@ pipeline {
             }
         }
 
-        stage('Install Node.js') {
-    steps {
-        sh 'curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -'
-        sh 'sudo dnf install -y nodejs'
-    }
-}
-
+        
   stage('Install Dependencies') {
     steps {
         sh 'cd web && npm install -g npm-check-updates'

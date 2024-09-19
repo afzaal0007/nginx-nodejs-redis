@@ -9,7 +9,9 @@ resource "aws_instance" "jenkins" {
 
   iam_instance_profile = aws_iam_instance_profile.jenkins_instance_profile.name
 
-  depends_on = [aws_iam_instance_profile.jenkins_instance_profile]
+  depends_on = [aws_iam_instance_profile.jenkins_instance_profile,
+    aws_eks_cluster.eks
+  ]
 
 
   user_data = <<-EOF
@@ -35,6 +37,11 @@ resource "aws_instance" "jenkins" {
     sudo chmod +x ./kubectl
     sudo mv ./kubectl /usr/local/bin
     aws eks update-kubeconfig --region ${var.region} --name ${var.cluster_name}
+    sleep 100
+    sudo dnf update
+    sudo dnf install git
+    sudo dnf install nodejs npm
+    sleep 100
 
 
 
