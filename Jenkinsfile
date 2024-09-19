@@ -1,5 +1,11 @@
 pipeline {
-    agent any
+    agent {
+        // Use a Node.js Docker image as the build agent
+        docker {
+            image 'node:14'
+            args '-u root'  // Run as root to avoid permission issues
+        }
+    }
 
     // environment {
     //     // Fetch secrets from AWS Secrets Manager
