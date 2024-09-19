@@ -35,7 +35,7 @@ pipeline {
         
   stage('Install Dependencies') {
     steps {
-        sh 'cd web && npm install -g npm-check-updates'
+        sh 'cd web && npm install -g npm-check-updates --unsafe-perm'
         sh 'ncu -u'
         sh 'cd web && npm install --save-dev mocha'
         sh 'cd web && npm audit fix'
