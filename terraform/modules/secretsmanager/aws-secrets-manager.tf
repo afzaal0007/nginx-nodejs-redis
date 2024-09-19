@@ -15,7 +15,7 @@ resource "aws_secretsmanager_secret_version" "env_secrets_version" {
     ECR_REPO_URI           = var.ECR_REPO_URI
     GIT_REPO               = var.GIT_REPO
     AWS_ECR_LOGIN          = "aws ecr get-login-password --region ${var.AWS_REGION} | docker login --username AWS --password-stdin ${var.ECR_REPO_URI}"
-    grafana_admin_password = var.grafana_admin_password # Ensure this variable is marked sensitive
+    GRAFANA_ADMIN_PASSWORD = var.grafana_admin_password # Ensure this variable is marked sensitive
 
   })
 }

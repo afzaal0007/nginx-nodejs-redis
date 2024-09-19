@@ -1,16 +1,29 @@
 pipeline {
     agent any
 
-    environment {
-        // Fetch secrets from AWS Secrets Manager
-        AWS_REGION = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".AWS_REGION"', returnStdout: true).trim()
-        SECRET_NAME = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".SECRET_NAME"', returnStdout: true).trim()
-        ECR_REPO_URI = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".ECR_REPO_URI"', returnStdout: true).trim()
-        GIT_REPO = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".GIT_REPO"', returnStdout: true).trim()
-        GRAFANA_ADMIN_PASSWORD = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".grafana_admin_password"', returnStdout: true).trim()
+    // environment {
+    //     // Fetch secrets from AWS Secrets Manager
+    //     AWS_REGION = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".AWS_REGION"', returnStdout: true).trim()
+    //     SECRET_NAME = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".SECRET_NAME"', returnStdout: true).trim()
+    //     ECR_REPO_URI = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".ECR_REPO_URI"', returnStdout: true).trim()
+    //     GIT_REPO = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".GIT_REPO"', returnStdout: true).trim()
+    //     GRAFANA_ADMIN_PASSWORD = sh(script: 'aws secretsmanager get-secret-value --secret-id your-secret-id --region your-region --query SecretString --output text | jq -r ".grafana_admin_password"', returnStdout: true).trim()
 
-        AWS_ECR_LOGIN = "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO_URI}"
+    //     AWS_ECR_LOGIN = "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO_URI}"
+    // }
+
+
+
+ environment {
+        AWS_REGION = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets --region ap-south-1 --query SecretString --output text | jq -r ".AWS_REGION"', returnStdout: true).trim()
+        SECRET_NAME = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets --region ap-south-1 --query SecretString --output text | jq -r ".SECRET_NAME"', returnStdout: true).trim()
+        ECR_REPO_URI = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets --region ap-south-1 --query SecretString --output text | jq -r ".ECR_REPO_URI"', returnStdout: true).trim()
+        GIT_REPO = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets --region ap-south-1 --query SecretString --output text | jq -r ".GIT_REPO"', returnStdout: true).trim()
+        AWS_ECR_LOGIN = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets --region ap-south-1 --query SecretString --output text | jq -r ".AWS_ECR_LOGIN"', returnStdout: true).trim()
+        GRAFANA_ADMIN_PASSWORD = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets --region ap-south-1 --query SecretString --output text | jq -r ".GRAFANA_ADMIN_PASSWORD"', returnStdout: true).trim()
     }
+
+
 
     stages {
         stage('Clone Repository') {
@@ -78,29 +91,29 @@ pipeline {
             }
         }
 
-        stage('Install Monitoring Tools') {
-            steps {
-                script {
-                    sh '''
-                      helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-                      helm repo update
-                      helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
-                      --namespace monitoring \
-                      --create-namespace \
-                      --set grafana.adminPassword=${GRAFANA_ADMIN_PASSWORD} \
-                      --values values.yaml \
-                      --version <chart_version>
-                    '''
-                }
-            }
-        }
+        // stage('Install Monitoring Tools') {
+        //     steps {
+        //         script {
+        //             sh '''
+        //               helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+        //               helm repo update
+        //               helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+        //               --namespace monitoring \
+        //               --create-namespace \
+        //               --set grafana.adminPassword=${GRAFANA_ADMIN_PASSWORD} \
+        //               --values values.yaml \
+        //               --version <chart_version>
+        //             '''
+        //         }
+        //     }
+        // }
 
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    def awsAccountId = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-env-secrets --region ap-south-1 --query SecretString --output text | jq -r ".AWS_ACCOUNT_ID"', returnStdout: true).trim()
-                    def region = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-env-secrets --region ap-south-1 --query SecretString --output text | jq -r ".AWS_REGION"', returnStdout: true).trim()
-                    def repoUri = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-env-secrets --region ap-south-1 --query SecretString --output text | jq -r ".ECR_REPO_URI"', returnStdout: true).trim()
+                    def awsAccountId = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets --region ap-south-1 --query SecretString --output text | jq -r ".AWS_ACCOUNT_ID"', returnStdout: true).trim()
+                    def region = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets --region ap-south-1 --query SecretString --output text | jq -r ".AWS_REGION"', returnStdout: true).trim()
+                    def repoUri = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets --region ap-south-1 --query SecretString --output text | jq -r ".ECR_REPO_URI"', returnStdout: true).trim()
 
                     sh """
                      sed -i 's|<aws_account_id>.dkr.ecr.<region>.amazonaws.com/web1:<tag>|${repoUri}/web1:${BUILD_NUMBER}|g' web1.yaml
