@@ -1,7 +1,7 @@
 pipeline {
     agent {
         // Use a Node.js Docker image as the build agent
-        docker {
+        dockerContainer {
             image 'node:14'
             args '-u root'  // Run as root to avoid permission issues
         }
