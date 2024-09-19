@@ -32,17 +32,21 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                script {
-                    sh 'cd web && npm install -g npm-check-updates'
-                    sh 'ncu -u'
-                    sh 'npm install --save-dev mocha'
-                    sh 'npm audit fix'
-                }
-            }
-        }
+        stage('Install Node.js') {
+    steps {
+        sh 'curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -'
+        sh 'sudo dnf install -y nodejs'
+    }
+}
 
+  stage('Install Dependencies') {
+    steps {
+        sh 'cd web && npm install -g npm-check-updates'
+        sh 'ncu -u'
+        sh 'cd web && npm install --save-dev mocha'
+        sh 'cd web && npm audit fix'
+    }
+}
         stage('Test') {
             steps {
                 script {
