@@ -27,14 +27,14 @@ locals {
   cluster_name  = "eks-cluster"
   eks_key_name  = "EKS-Key-PAIR"
   eks_version   = "1.30"
-  desired_size  = 1
-  min_size      = 1
-  max_size      = 2
-  instance_type = "t2.small"
+  desired_size  = 2
+  min_size      = 2
+  max_size      = 3
+  instance_type = "t2.medium"
 
   cluster_role_name        = "eks-cluster-role"
   worker_node_role_name    = "eks-worker-node-role"
-  EkS_Worker_Node_Instance = ["t2.small"]
+  EkS_Worker_Node_Instance = ["t2.medium"]
   eks_node_ami_type        = "AL2_x86_64"
 
 
@@ -46,7 +46,7 @@ locals {
 
   jenkins_name = "jenkins"
 
-  jenkins_instance_type = "t2.micro"
+  jenkins_instance_type = "t2.small"
 
   jenins_subnet_id = "10.0.1.0/24"
 

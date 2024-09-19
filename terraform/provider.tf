@@ -16,8 +16,13 @@ provider "aws" {
 
 # main.tf
 
+provider "kubernetes" {
+  # Kubernetes provider configuration
+  config_path = "~/.kube/config" # Path to your kubeconfig file
+}
+
 provider "helm" {
   kubernetes {
-    config_path = "~/.kube/config" # Ensure kubeconfig is correctly set
+    config_path = "~/.kube/config"
   }
 }
