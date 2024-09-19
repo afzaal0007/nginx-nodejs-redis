@@ -1,0 +1,73 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_ECR_LOGIN = 'aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 772149515781.dkr.ecr.ap-south-1.amazonaws.com'
+        ECR_REPO_URI = '772149515781.dkr.ecr.ap-south-1.amazonaws.com'
+        GIT_REPO = 'https://github.com/afzaal0007/nginx-nodejs-redis.git'
+        IMAGE_TAG = "${env.BUILD_ID}"
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main', url: "${GIT_REPO}"
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                script {
+                    sh 'docker-compose build'
+                }
+            }
+        }
+
+        stage('Push Images to ECR') {
+            steps {
+                script {
+                    // Log in to AWS ECR
+                    sh "${AWS_ECR_LOGIN}"
+
+                    // Push Redis image
+                    sh """
+                        docker tag redis:alpine ${ECR_REPO_URI}/redis:latest
+                        docker push ${ECR_REPO_URI}/redis:latest
+                    """
+
+                    // Push Web1 image
+                    sh """
+                        docker tag web1 ${ECR_REPO_URI}/web1:${IMAGE_TAG}
+                        docker push ${ECR_REPO_URI}/web1:${IMAGE_TAG}
+                    """
+
+                    // Push Web2 image
+                    sh """
+                        docker tag web2 ${ECR_REPO_URI}/web2:${IMAGE_TAG}
+                        docker push ${ECR_REPO_URI}/web2:${IMAGE_TAG}
+                    """
+
+                    // Push Nginx image
+                    sh """
+                        docker tag nginx ${ECR_REPO_URI}/nginx:${IMAGE_TAG}
+                        docker push ${ECR_REPO_URI}/nginx:${IMAGE_TAG}
+                    """
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    // Apply the Kubernetes YAML files
+                    sh """
+                        kubectl apply -f k8s-redis.yaml
+                        kubectl apply -f k8s-web1.yaml
+                        kubectl apply -f k8s-web2.yaml
+                        kubectl apply -f k8s-nginx.yaml
+                    """
+                }
+            }
+        }
+    }
+}

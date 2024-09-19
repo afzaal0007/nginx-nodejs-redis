@@ -35,10 +35,10 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    sh 'cd app && npm install -g npm-check-updates'
+                    sh 'cd web && npm install -g npm-check-updates'
                     sh 'ncu -u'
-                    sh 'cd app && npm install --save-dev mocha'
-                    sh 'cd app && npm audit fix'
+                    sh 'npm install --save-dev mocha'
+                    sh 'npm audit fix'
                 }
             }
         }
@@ -46,7 +46,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    sh 'cd app && npm test'
+                    sh 'cd web && npm test'
                 }
             }
         }
