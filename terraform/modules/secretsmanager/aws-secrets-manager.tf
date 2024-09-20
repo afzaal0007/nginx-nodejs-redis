@@ -1,6 +1,6 @@
 # Create AWS Secrets Manager secret
 resource "aws_secretsmanager_secret" "env_secrets-01" {
-  name                    = "jenkins-secrets"
+  name                    = "jenkins-secrets-03"
   description             = "Secrets for Jenkins environment variables"
   recovery_window_in_days = 7 # Optional: Grace period before permanent deletion
 }

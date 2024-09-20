@@ -30,11 +30,11 @@ locals {
   desired_size  = 2
   min_size      = 2
   max_size      = 3
-  instance_type = "t2.medium"
+  instance_type = "t2.small"
 
   cluster_role_name        = "eks-cluster-role"
   worker_node_role_name    = "eks-worker-node-role"
-  EkS_Worker_Node_Instance = ["t2.medium"]
+  EkS_Worker_Node_Instance = ["t2.small"]
   eks_node_ami_type        = "AL2_x86_64"
 
 

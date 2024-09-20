@@ -9,7 +9,7 @@
 # CMD ["npm","start"]
 
 
-FROM node:14
+FROM node:22-alpine
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -17,8 +17,12 @@ WORKDIR /usr/src/app
 # Copy package.json and package-lock.json
 COPY package.json package-lock.json ./
 
-# Install app dependencies
 RUN npm install
+
+# RUN npm install -g npm-check-updates && \
+#     ncu -u && \
+#     npm install --save-dev mocha && \
+#     npm audit fix
 
 # Copy all .js and .json files from the web folder
 COPY server.js metrics.js package.json package-lock.json ./

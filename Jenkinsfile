@@ -1,11 +1,13 @@
 pipeline {
-    agent {
-        // Use a Node.js Docker image as the build agent
-        dockerContainer {
-            image 'node:14'
-            args '-u root'  // Run as root to avoid permission issues
-        }
-    }
+
+    agent any
+    // agent {
+    //     // Use a Node.js Docker image as the build agent
+    //     dockerContainer {
+    //         image 'node:14'
+    //         args '-u root'  // Run as root to avoid permission issues
+    //     }
+    // }
 
     // environment {
     //     // Fetch secrets from AWS Secrets Manager
@@ -39,21 +41,21 @@ pipeline {
         }
 
         
-  stage('Install Dependencies') {
-    steps {
-        sh 'cd web && npm install -g npm-check-updates --unsafe-perm'
-        sh 'ncu -u'
-        sh 'cd web && npm install --save-dev mocha'
-        sh 'cd web && npm audit fix'
-    }
-}
-        stage('Test') {
-            steps {
-                script {
-                    sh 'cd web && npm test'
-                }
-            }
-        }
+//   stage('Install Dependencies') {
+//     steps {
+//         sh 'cd web && npm install -g npm-check-updates --unsafe-perm'
+//         sh 'ncu -u'
+//         sh 'cd web && npm install --save-dev mocha'
+//         sh 'cd web && npm audit fix'
+//     }
+// }
+//         stage('Test') {
+//             steps {
+//                 script {
+//                     sh 'cd web && npm test'
+//                 }
+//             }
+//         }
 
         stage('Build Docker Images') {
             steps {

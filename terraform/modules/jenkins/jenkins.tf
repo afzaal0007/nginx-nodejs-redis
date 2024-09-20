@@ -9,8 +9,8 @@ resource "aws_instance" "jenkins" {
 
   iam_instance_profile = aws_iam_instance_profile.jenkins_instance_profile.name
 
-  depends_on = [aws_iam_instance_profile.jenkins_instance_profile,
-    aws_eks_cluster.eks
+  depends_on = [aws_iam_instance_profile.jenkins_instance_profile
+
   ]
 
 
@@ -35,7 +35,8 @@ resource "aws_instance" "jenkins" {
     sleep 100
     sudo chmod +x ./kubectl
     sudo mv ./kubectl /usr/local/bin
-    aws eks update-kubeconfig --region ${var.region} --name ${var.cluster_name}
+    # aws eks update-kubeconfig --region ${var.region} --name ${var.cluster_name}
+aws eks update-kubeconfig --region ap-south-1 --name eks-cluster
     sleep 100
     sudo dnf update -y
     sudo dnf install git -y
