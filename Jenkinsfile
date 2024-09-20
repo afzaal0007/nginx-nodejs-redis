@@ -81,10 +81,10 @@ pipeline {
             sh "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 772149515781.dkr.ecr.ap-south-1.amazonaws.com"
 
             // Step 2: Push Redis image
-            sh """
-                docker tag redis:alpine ${ECR_REPO_URI}/redis:alpine
-                docker push ${ECR_REPO_URI}/redis:alpine
-            """
+            // sh """
+            //     docker tag redis:alpine ${ECR_REPO_URI}/redis:alpine
+            //     docker push ${ECR_REPO_URI}/redis:alpine
+            // """
 
             // Step 3: Push Web1 image with BUILD_NUMBER as the tag
             sh """
