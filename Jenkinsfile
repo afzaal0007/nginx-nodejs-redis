@@ -36,7 +36,9 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: "${GIT_REPO}"
+                //git branch: 'main', url: "${GIT_REPO}"
+                checkout([$class: 'GitSCM', branches: [[name: "main"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-github', url: 'git@github.com:https://github.com/afzaal0007/nginx-nodejs-redis.git']]])
+
             }
         }
 
