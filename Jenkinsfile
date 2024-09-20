@@ -74,37 +74,39 @@ pipeline {
             }
         }
 
-        stage('Push Images to ECR') {
-            steps {
-                script {
-                    sh "${AWS_ECR_LOGIN}"
+       stage('Push Images to ECR') {
+    steps {
+        script {
+            // Step 1: Log in to ECR using the AWS CLI
+            sh "${AWS_ECR_LOGIN}"
 
-                    // Push Redis image
-                    sh """
-                        docker tag redis:alpine ${ECR_REPO_URI}/redis:alpine
-                        docker push ${ECR_REPO_URI}/redis:alpine
-                    """
+            // Step 2: Push Redis image
+            sh """
+                docker tag redis:alpine ${ECR_REPO_URI}/redis:alpine
+                docker push ${ECR_REPO_URI}/redis:alpine
+            """
 
-                    // Push Web1 image
-                    sh """
-                        docker tag web1 ${ECR_REPO_URI}/web1:${BUILD_NUMBER}
-                        docker push ${ECR_REPO_URI}/web1:${BUILD_NUMBER}
-                    """
+            // Step 3: Push Web1 image with BUILD_NUMBER as the tag
+            sh """
+                docker tag web1 ${ECR_REPO_URI}/web1:${BUILD_NUMBER}
+                docker push ${ECR_REPO_URI}/web1:${BUILD_NUMBER}
+            """
 
-                    // Push Web2 image
-                    sh """
-                        docker tag web2 ${ECR_REPO_URI}/web2:${BUILD_NUMBER}
-                        docker push ${ECR_REPO_URI}/web2:${BUILD_NUMBER}
-                    """
+            // Step 4: Push Web2 image with BUILD_NUMBER as the tag
+            sh """
+                docker tag web2 ${ECR_REPO_URI}/web2:${BUILD_NUMBER}
+                docker push ${ECR_REPO_URI}/web2:${BUILD_NUMBER}
+            """
 
-                    // Push Nginx image
-                    sh """
-                        docker tag nginx ${ECR_REPO_URI}/nginx:${BUILD_NUMBER}
-                        docker push ${ECR_REPO_URI}/nginx:${BUILD_NUMBER}
-                    """
-                }
-            }
+            // Step 5: Push Nginx image with BUILD_NUMBER as the tag
+            sh """
+                docker tag nginx ${ECR_REPO_URI}/nginx:${BUILD_NUMBER}
+                docker push ${ECR_REPO_URI}/nginx:${BUILD_NUMBER}
+            """
         }
+    }
+}
+
 
         // stage('Install Monitoring Tools') {
         //     steps {
