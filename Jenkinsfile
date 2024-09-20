@@ -78,7 +78,7 @@ pipeline {
     steps {
         script {
             // Step 1: Log in to ECR using the AWS CLI
-            sh "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${ECR_REPO_URI}"
+            sh "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 772149515781.dkr.ecr.ap-south-1.amazonaws.com"
 
             // Step 3: Tag and push Web1 image (nodejs-app-web1 as web1 in ECR)
             sh """
