@@ -74,38 +74,33 @@ pipeline {
             }
         }
 
-       stage('Push Images to ECR') {
+     stage('Push Images to ECR') {
     steps {
         script {
             // Step 1: Log in to ECR using the AWS CLI
-            sh "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 772149515781.dkr.ecr.ap-south-1.amazonaws.com"
+            sh "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${ECR_REPO_URI}"
 
-            // Step 2: Push Redis image
-            // sh """
-            //     docker tag redis:alpine ${ECR_REPO_URI}/redis:alpine
-            //     docker push ${ECR_REPO_URI}/redis:alpine
-            // """
-
-            // Step 3: Push Web1 image with BUILD_NUMBER as the tag
+            // Step 3: Tag and push Web1 image (nodejs-app-web1 as web1 in ECR)
             sh """
-                docker tag web1 ${ECR_REPO_URI}/web1:${BUILD_NUMBER}
+                docker tag nodejs-app-web1 ${ECR_REPO_URI}/web1:${BUILD_NUMBER}
                 docker push ${ECR_REPO_URI}/web1:${BUILD_NUMBER}
             """
 
-            // Step 4: Push Web2 image with BUILD_NUMBER as the tag
+            // Step 4: Tag and push Web2 image (nodejs-app-web2 as web2 in ECR)
             sh """
-                docker tag web2 ${ECR_REPO_URI}/web2:${BUILD_NUMBER}
+                docker tag nodejs-app-web2 ${ECR_REPO_URI}/web2:${BUILD_NUMBER}
                 docker push ${ECR_REPO_URI}/web2:${BUILD_NUMBER}
             """
 
-            // Step 5: Push Nginx image with BUILD_NUMBER as the tag
+            // Step 5: Tag and push Nginx image (nodejs-app-nginx as nginx in ECR)
             sh """
-                docker tag nginx ${ECR_REPO_URI}/nginx:${BUILD_NUMBER}
+                docker tag nodejs-app-nginx ${ECR_REPO_URI}/nginx:${BUILD_NUMBER}
                 docker push ${ECR_REPO_URI}/nginx:${BUILD_NUMBER}
             """
         }
     }
 }
+
 
 
         // stage('Install Monitoring Tools') {
