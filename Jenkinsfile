@@ -23,12 +23,12 @@ pipeline {
 
 
  environment {
-        AWS_REGION = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets-03 --region ap-south-1 --query SecretString --output text | jq -r ".AWS_REGION"', returnStdout: true).trim()
-        SECRET_NAME = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets-03 --region ap-south-1 --query SecretString --output text | jq -r ".SECRET_NAME"', returnStdout: true).trim()
-        ECR_REPO_URI = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets-03 --region ap-south-1 --query SecretString --output text | jq -r ".ECR_REPO_URI"', returnStdout: true).trim()
-        GIT_REPO = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets-03 --region ap-south-1 --query SecretString --output text | jq -r ".GIT_REPO"', returnStdout: true).trim()
-        AWS_ECR_LOGIN = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets-03 --region ap-south-1 --query SecretString --output text | jq -r ".AWS_ECR_LOGIN"', returnStdout: true).trim()
-        GRAFANA_ADMIN_PASSWORD = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets-03 --region ap-south-1 --query SecretString --output text | jq -r ".GRAFANA_ADMIN_PASSWORD"', returnStdout: true).trim()
+        AWS_REGION = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets-04 --region ap-south-1 --query SecretString --output text | jq -r ".AWS_REGION"', returnStdout: true).trim()
+        SECRET_NAME = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets-04 --region ap-south-1 --query SecretString --output text | jq -r ".SECRET_NAME"', returnStdout: true).trim()
+        ECR_REPO_URI = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets-04 --region ap-south-1 --query SecretString --output text | jq -r ".ECR_REPO_URI"', returnStdout: true).trim()
+        GIT_REPO = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets-04 --region ap-south-1 --query SecretString --output text | jq -r ".GIT_REPO"', returnStdout: true).trim()
+        AWS_ECR_LOGIN = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets-04 --region ap-south-1 --query SecretString --output text | jq -r ".AWS_ECR_LOGIN"', returnStdout: true).trim()
+        GRAFANA_ADMIN_PASSWORD = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets-04 --region ap-south-1 --query SecretString --output text | jq -r ".GRAFANA_ADMIN_PASSWORD"', returnStdout: true).trim()
     }
 
 
@@ -117,9 +117,9 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    def awsAccountId = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets-03 --region ap-south-1 --query SecretString --output text | jq -r ".AWS_ACCOUNT_ID"', returnStdout: true).trim()
-                    def region = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets-03 --region ap-south-1 --query SecretString --output text | jq -r ".AWS_REGION"', returnStdout: true).trim()
-                    def repoUri = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets-03 --region ap-south-1 --query SecretString --output text | jq -r ".ECR_REPO_URI"', returnStdout: true).trim()
+                    def awsAccountId = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets-04 --region ap-south-1 --query SecretString --output text | jq -r ".AWS_ACCOUNT_ID"', returnStdout: true).trim()
+                    def region = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets-04 --region ap-south-1 --query SecretString --output text | jq -r ".AWS_REGION"', returnStdout: true).trim()
+                    def repoUri = sh(script: 'aws secretsmanager get-secret-value --secret-id jenkins-secrets-04 --region ap-south-1 --query SecretString --output text | jq -r ".ECR_REPO_URI"', returnStdout: true).trim()
 
                     sh """
                      sed -i 's|<aws_account_id>.dkr.ecr.<region>.amazonaws.com/web1:<tag>|${repoUri}/web1:${BUILD_NUMBER}|g' web1.yaml
